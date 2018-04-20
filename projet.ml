@@ -1,6 +1,4 @@
-#load "str.cma";;
-
-open List
+#load "str.cma"
 
 type line = int
 type regidx = int
@@ -46,7 +44,7 @@ let instptr_mk urmcmd_list =
     match urmcmd_list with
     | [] -> acc
     | instr :: tail -> aux tail (count + 1) ((count, instr) :: acc)
-  in InstPtr([], rev (aux urmcmd_list 0 []))
+  in InstPtr([], List.rev (aux urmcmd_list 0 []))
 
 (* Moves the pointer to the previous instruction *)
 let instptr_move_up = function
