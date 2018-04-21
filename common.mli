@@ -4,15 +4,35 @@
  *)
 
 type line = int
+type label = string
 type regidx = int
 type regval = int
 type reg = Reg of regidx * regval
 
 type urmcmd =
+  | URMCopy of regidx * regidx
+  | URMJump of regidx * regidx * line
+  | URMSucc of regidx
+  | URMZero of regidx
+
+type eurmcmd =
+  | Add of regidx * regidx
+  | Comment of string
   | Copy of regidx * regidx
-  | Jump of regidx * regidx * line
-  | Succ of regidx
+  | Dec of regidx
+  | EqPredicate of regidx * regidx * label
+  | GEqPredicate of regidx * regidx * label
+  | GTPredicate of regidx * regidx * label
+  | Goto of label
+  | Inc of regidx
+  | Label of label
+  | LEqPredicate of regidx * regidx * label
+  | LTPredicate of regidx * regidx * label
+  | Mult of regidx * regidx
+  | Quit
+  | Sub of regidx * regidx
   | Zero of regidx
+  | ZeroPredicate of regidx * label
 
 type instptr = InstPtr of (line * urmcmd) list * (line * urmcmd) list
 
@@ -21,4 +41,7 @@ type urm = {
   regs : reg list
 }
 
+type state = { todo : int }
+
 exception Syntax_error
+
