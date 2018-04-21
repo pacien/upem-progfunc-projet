@@ -10,6 +10,8 @@
 
 # ocamlbuild working directory
 _build/
+._d/
+._ncdi/
 
 # ocamlbuild targets
 *.byte
@@ -18,3 +20,6 @@ _build/
 # oasis generated files
 setup.data
 setup.log
+
+# binaries
+urm

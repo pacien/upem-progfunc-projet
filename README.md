@@ -2,11 +2,24 @@
 
 Unlimited Register Machine in OCaml.
 
+## Requirements
+
+* ocaml
+* GNU Make
+* [OCaml Makefile](https://mmottl.github.io/ocaml-makefile/)
+* [kaputt](http://kaputt.x9c.fr/)
+
+
+## Make targets
+
+* Build: `make nc` produces a binary named `urm`
+* Test: `make test`
+* Clean: `make clean`
+
+
 ## Usage
 
-* Requirements: ocaml, GNU Make, OCaml Makefile
-* Build: `make nc` produces a binary named `urm`
-* Clean: `make clean`
+TODO: describe usage of the `urm` program.
 
 
 ## Authors
@@ -18,3 +31,4 @@ Unlimited Register Machine in OCaml.
 ## License
 
 Project distributed under the terms of the Creative Commons BY-NC-SA 3.0 license.
+
