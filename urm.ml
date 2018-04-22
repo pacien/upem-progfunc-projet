@@ -32,3 +32,4 @@ let urm_run_trace = urm_run (* TODO *)
 
 (* Creates an URM from a command list and a register list *)
 let urm_mk cmd_list reg_list = { instptr = (instptr_mk cmd_list) ; regs = reg_list }
+
