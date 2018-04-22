@@ -20,7 +20,13 @@ let rec program_of_lex = function
     | "jump" :: arg_1 :: arg_2 :: arg_3 :: tail -> (Jump ((int_of_string arg_1), (int_of_string arg_2), (int_of_string arg_3))) :: (program_of_lex tail)
     | _ -> raise Syntax_error
 
-let program_of_string str =
-  let lex = Str.split (Str.regexp "[\t\n(),]+") str
-  in List.iter (fun s -> print_string s; print_newline ()) lex; program_of_lex lex
+(* FIXME: reject multiple definition of a single register *)
+let rec regs_of_lex = function
+  | [] -> []
+  | regnum :: regvalue :: tail -> Reg (int_of_string regnum, int_of_string regvalue) :: (regs_of_lex tail)
+  | _ -> raise Syntax_error
+
+let seq_from_string lexer_func str =  Str.split (Str.regexp "[\t\n(), ]+") str |> lexer_func
+let program_of_string = seq_from_string program_of_lex
+let regs_of_string = seq_from_string regs_of_lex
 

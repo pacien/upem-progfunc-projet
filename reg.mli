@@ -21,3 +21,7 @@ val regs_get : reg list -> regidx -> regval
 (* Set the value of the register to value,
  * or creates it to the value specified if it does not exist *)
 val regs_set : reg list -> regidx -> regval -> reg list
+
+(* Returns the string representation of a register list. *)
+val regs_string : reg list -> string
+

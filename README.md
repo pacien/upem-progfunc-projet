@@ -19,7 +19,11 @@ Unlimited Register Machine in OCaml.
 
 ## Usage
 
-TODO: describe usage of the `urm` program.
+```
+./urm <run | trace> <program file> <initial register state file>
+```
+
+Examples programs are provided in the `examples` folder.
 
 
 ## Authors

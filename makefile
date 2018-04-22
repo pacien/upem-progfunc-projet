@@ -6,7 +6,8 @@ SOURCES = \
   parser.mli parser.ml \
   instptr.mli instptr.ml \
   reg.mli reg.ml \
-  urm.mli urm.ml urm_test.ml
+  urm.mli urm.ml urm_test.ml \
+  main.ml
 
 OCAMLMAKEFILE = /usr/share/ocamlmakefile/OCamlMakefile
 include $(OCAMLMAKEFILE)
