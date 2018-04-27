@@ -6,9 +6,8 @@
 open Common
 open Instptr
 open Urm
+open Reg
 open Kaputt.Abbreviations
-
-let sort_regs = List.sort (fun (Reg(l, _)) (Reg(r, _)) -> compare l r)
 
 let () =
   Test.add_simple_test
@@ -54,7 +53,7 @@ let () =
        in let output_regs = urm_run output_prgm
        in
          Assert.is_true (output_prgm = expected_urm);
-         Assert.is_true ((sort_regs output_regs) = expected_output))
+         Assert.is_true ((regs_sort output_regs) = expected_output))
 
 let () =
   Test.add_simple_test
@@ -146,7 +145,7 @@ let () =
        in let output_regs = urm_run output_prgm
        in
          Assert.is_true (output_prgm = expected_urm);
-         Assert.is_true ((sort_regs output_regs) = expected_output))
+         Assert.is_true ((regs_sort output_regs) = expected_output))
 
 let () = if Array.mem "run-tests" Sys.argv then Test.launch_tests ()
 

@@ -22,6 +22,8 @@ val regs_get : reg list -> regidx -> regval
  * or creates it to the value specified if it does not exist *)
 val regs_set : reg list -> regidx -> regval -> reg list
 
+(* Sorts a list of registers in ascending index order *)
+val regs_sort : reg list -> reg list
+
 (* Returns the string representation of a register list. *)
 val regs_string : reg list -> string
-
