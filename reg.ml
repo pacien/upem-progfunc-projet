@@ -16,5 +16,5 @@ let regs_get reglist index =
 let regs_set reglist index value =
   Reg(index, value) :: List.filter (fun (Reg(idx, _)) -> idx != index) reglist
 
-let rec regs_string reglist = List.map (reg_string) reglist |> String.concat ", "
+let regs_string reglist = List.map (reg_string) reglist |> String.concat ", "
 
