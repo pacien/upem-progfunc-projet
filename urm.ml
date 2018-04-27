@@ -23,12 +23,18 @@ let urm_apply urm =
     | _, _ -> { instptr = urm.instptr ; regs = urm.regs } |> urm_move_down
   in if instptr_end urm.instptr then urm else aux (instptr_get urm.instptr)
 
-(* Launches the URM *)
-let rec urm_run = function
+let rec urm_run_pre pre = function
   | { instptr = InstPtr(_, []) ; regs = reg_list } -> reg_list
-  | urm -> urm_apply urm |> urm_run
+  | urm -> pre urm; urm_apply urm |> urm_run_pre pre
 
-let urm_run_trace = urm_run (* TODO *)
+let urm_run = urm_run_pre (fun _ -> ())
+
+let urm_run_trace =
+  let print_func u =
+    print_endline (instptr_string u.instptr);
+    print_endline (regs_string u.regs);
+    print_newline ()
+  in urm_run_pre (print_func)
 
 (* Creates an URM from a command list and a register list *)
 let urm_mk cmd_list reg_list = { instptr = (instptr_mk cmd_list) ; regs = reg_list }
