@@ -27,4 +27,3 @@ let () = match Sys.argv with
   | [| _; "run-tests" |] -> () (* handled in test files *)
   | [| _; mode; prgm; regs |] -> run (run_mode_of_string mode) (read_prgm prgm) (read_regs regs)
   | _ -> print_endline "Usage: urm <run-tests | run <prgmfile> <regfile> | trace <prgmfile> <regfile>>"
-

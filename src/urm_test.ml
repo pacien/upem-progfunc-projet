@@ -14,33 +14,33 @@ let () =
     ~title:"example_urm_add_program"
     (fun () ->
        let input_prgm = [
-         Zero 0;
-         Zero 3;
-         Jump (1, 3, 6);
-         Succ 0;
-         Succ 3;
-         Jump (3, 3, 2);
-         Zero 3;
-         Jump (2, 3, 11);
-         Succ 0;
-         Succ 3;
-         Jump (3, 3, 7)]
+         URMZero 0;
+         URMZero 3;
+         URMJump (1, 3, 6);
+         URMSucc 0;
+         URMSucc 3;
+         URMJump (3, 3, 2);
+         URMZero 3;
+         URMJump (2, 3, 11);
+         URMSucc 0;
+         URMSucc 3;
+         URMJump (3, 3, 7)]
        and input_regs = [
          Reg (1, 2);
          Reg (2, 3)]
        and expected_urm = {
          instptr = InstPtr ([], [
-           (0, Zero 0);
-           (1, Zero 3);
-           (2, Jump (1, 3, 6));
-           (3, Succ 0);
-           (4, Succ 3);
-           (5, Jump (3, 3, 2));
-           (6, Zero 3);
-           (7, Jump (2, 3, 11));
-           (8, Succ 0);
-           (9, Succ 3);
-           (10, Jump (3, 3, 7))]);
+           (0, URMZero 0);
+           (1, URMZero 3);
+           (2, URMJump (1, 3, 6));
+           (3, URMSucc 0);
+           (4, URMSucc 3);
+           (5, URMJump (3, 3, 2));
+           (6, URMZero 3);
+           (7, URMJump (2, 3, 11));
+           (8, URMSucc 0);
+           (9, URMSucc 3);
+           (10, URMJump (3, 3, 7))]);
          regs = [
            Reg (1, 2);
            Reg (2, 3)]}
@@ -60,72 +60,72 @@ let () =
     ~title:"example_urm_factorial_program"
     (fun () ->
        let input_prgm = [
-         Zero 4;
-         Jump (1, 4, 4);
-         Zero 8;
-         Jump (8, 8, 7);
-         Succ 1;
-         Zero 9;
-         Jump (9, 9, 29);
-         Copy (2, 1);
-         Zero 1;
-         Succ 1;
-         Zero 3;
-         Succ 3;
-         Copy (5, 1);
-         Zero 1;
-         Zero 6;
-         Jump (3, 6, 25);
-         Zero 7;
-         Jump (5, 7, 22);
-         Succ 1;
-         Succ 7;
-         Zero 10;
-         Jump (10, 10, 17);
-         Succ 6;
-         Zero 11;
-         Jump (11, 11, 15);
-         Jump (2, 3, 29);
-         Succ 3;
-         Zero 12;
-         Jump (12, 12, 12);
-         Zero 13;
-         Jump (13, 13, 38)]
+         URMZero 4;
+         URMJump (1, 4, 4);
+         URMZero 8;
+         URMJump (8, 8, 7);
+         URMSucc 1;
+         URMZero 9;
+         URMJump (9, 9, 29);
+         URMCopy (2, 1);
+         URMZero 1;
+         URMSucc 1;
+         URMZero 3;
+         URMSucc 3;
+         URMCopy (5, 1);
+         URMZero 1;
+         URMZero 6;
+         URMJump (3, 6, 25);
+         URMZero 7;
+         URMJump (5, 7, 22);
+         URMSucc 1;
+         URMSucc 7;
+         URMZero 10;
+         URMJump (10, 10, 17);
+         URMSucc 6;
+         URMZero 11;
+         URMJump (11, 11, 15);
+         URMJump (2, 3, 29);
+         URMSucc 3;
+         URMZero 12;
+         URMJump (12, 12, 12);
+         URMZero 13;
+         URMJump (13, 13, 38)]
        and input_regs = [
          Reg (1, 5)]
        and expected_urm = {
          instptr = InstPtr ([], [
-           (0, Zero 4);
-           (1, Jump (1, 4, 4));
-           (2, Zero 8);
-           (3, Jump (8, 8, 7));
-           (4, Succ 1);
-           (5, Zero 9);
-           (6, Jump (9, 9, 29));
-           (7, Copy (2, 1));
-           (8, Zero 1);
-           (9, Succ 1);
-           (10, Zero 3);
-           (11, Succ 3);
-           (12, Copy (5, 1));
-           (13, Zero 1);
-           (14, Zero 6);
-           (15, Jump (3, 6, 25));
-           (16, Zero 7);
-           (17, Jump (5, 7, 22));
-           (18, Succ 1);
-           (19, Succ 7);
-           (20, Zero 10);
-           (21, Jump (10, 10, 17));
-           (22, Succ 6);
-           (23, Zero 11);
-           (24, Jump (11, 11, 15));
-           (25, Jump (2, 3, 29));
-           (26, Succ 3);
-           (27, Zero 12);
-           (28, Jump (12, 12, 12));
-           (29, Zero 13);
-           (30, Jump (13, 13, 38))]);
+           (0, URMZero 4);
+           (1, URMJump (1, 4, 4));
+           (2, URMZero 8);
+           (3, URMJump (8, 8, 7));
+           (4, URMSucc 1);
+           (5, URMZero 9);
+           (6, URMJump (9, 9, 29));
+           (7, URMCopy (2, 1));
+           (8, URMZero 1);
+           (9, URMSucc 1);
+           (10, URMZero 3);
+           (11, URMSucc 3);
+           (12, URMCopy (5, 1));
+           (13, URMZero 1);
+           (14, URMZero 6);
+           (15, URMJump (3, 6, 25));
+           (16, URMZero 7);
+           (17, URMJump (5, 7, 22));
+           (18, URMSucc 1);
+           (19, URMSucc 7);
+           (20, URMZero 10);
+           (21, URMJump (10, 10, 17));
+           (22, URMSucc 6);
+           (23, URMZero 11);
+           (24, URMJump (11, 11, 15));
+           (25, URMJump (2, 3, 29));
+           (26, URMSucc 3);
+           (27, URMZero 12);
+           (28, URMJump (12, 12, 12));
+           (29, URMZero 13);
+           (30, URMJump (13, 13, 38))]);
          regs = [
            Reg (1, 5)]}
        and expected_output = [

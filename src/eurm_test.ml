@@ -72,4 +72,3 @@ let () =
          Assert.is_true (output_urm = expected_urm))
 
 let () = if Array.mem "run-tests" Sys.argv then Test.launch_tests ()
-

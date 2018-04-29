@@ -15,11 +15,11 @@ let urm_move_down urm = { instptr = instptr_move_down urm.instptr ; regs = urm.r
 (* Applies the current instruction pointed by the pointer of instruction. Modifies the pointer of instruction for every instruction *)
 let urm_apply urm =
   let aux = function
-    | _, Zero(a) -> { instptr = urm.instptr ; regs = regs_set (urm.regs) a 0 } |> urm_move_down
-    | _, Copy(a, b) when a != b -> { instptr = urm.instptr ; regs = regs_set urm.regs a (regs_get urm.regs b) } |> urm_move_down
-    | _, Copy(a, b) -> failwith "Copy from one register to itself"
-    | _, Succ(a) -> { instptr = urm.instptr ; regs = regs_set urm.regs a ((regs_get urm.regs a) + 1) } |> urm_move_down
-    | _, Jump(a, b, c) when (regs_get urm.regs a) = (regs_get urm.regs b) -> { instptr = (instptr_jump urm.instptr (fst (instptr_get urm.instptr) - c)) ; regs = urm.regs }
+    | _, URMZero(a) -> { instptr = urm.instptr ; regs = regs_set (urm.regs) a 0 } |> urm_move_down
+    | _, URMCopy(a, b) when a != b -> { instptr = urm.instptr ; regs = regs_set urm.regs a (regs_get urm.regs b) } |> urm_move_down
+    | _, URMCopy(a, b) -> failwith "Copy from one register to itself"
+    | _, URMSucc(a) -> { instptr = urm.instptr ; regs = regs_set urm.regs a ((regs_get urm.regs a) + 1) } |> urm_move_down
+    | _, URMJump(a, b, c) when (regs_get urm.regs a) = (regs_get urm.regs b) -> { instptr = (instptr_jump urm.instptr (fst (instptr_get urm.instptr) - c)) ; regs = urm.regs }
     | _, _ -> { instptr = urm.instptr ; regs = urm.regs } |> urm_move_down
   in if instptr_end urm.instptr then urm else aux (instptr_get urm.instptr)
 
@@ -38,4 +38,3 @@ let urm_run_trace =
 
 (* Creates an URM from a command list and a register list *)
 let urm_mk cmd_list reg_list = { instptr = (instptr_mk cmd_list) ; regs = reg_list }
-

@@ -19,4 +19,3 @@ val program_of_string : string -> urmcmd list
 
 (* Parses the string representation of serialized registers. *)
 val regs_of_string : string -> reg list
-

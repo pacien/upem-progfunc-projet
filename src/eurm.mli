@@ -22,4 +22,3 @@ val compile_stage4 : eurmcmd list -> state -> urmcmd list * state
 
 (* Transcompiles an EURM instruction sequence into URM *)
 val urm_from_eurm : eurmcmd list -> urmcmd list
-
