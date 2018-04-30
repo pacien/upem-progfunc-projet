@@ -41,6 +41,9 @@ type urm = {
   regs : reg list
 }
 
-type state = { todo : int }
+type state = {
+  max_reg : int;
+  label_count : int
+}
 
 exception Syntax_error
