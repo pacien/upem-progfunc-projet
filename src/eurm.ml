@@ -67,10 +67,10 @@ let compile_stage1 eurmcmds state =
          add_reg_label state 1 0
 
     | Mult(r1, r2) ->
-      let ctr_reg = state.max_reg + 1 and aux_reg = state.max_reg + 2
+      let ctr_reg = state.max_reg + 1 and res_reg = state.max_reg + 2
       and start_label = string_of_int (state.label_count + 1) and end_label = string_of_int (state.label_count + 2)
-      in [ Zero(ctr_reg); Copy(aux_reg, r1); Label(start_label); EqPredicate(ctr_reg, r2, end_label);
-           Add(r1, aux_reg); Inc(ctr_reg); Goto(start_label); Label(end_label) ],
+      in [ Zero(ctr_reg); Zero(res_reg); Label(start_label); EqPredicate(ctr_reg, r2, end_label);
+           Add(res_reg, r1); Inc(ctr_reg); Goto(start_label); Label(end_label); Copy(r1, res_reg) ],
          add_reg_label state 2 2
 
     | ZeroPredicate(r, l) ->
