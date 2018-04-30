@@ -43,7 +43,8 @@ type urm = {
 
 type state = {
   max_reg : int;
-  label_count : int
+  label_count : int;
+  label_table : (string, int) Hashtbl.t
 }
 
 exception Syntax_error

@@ -8,24 +8,22 @@ open Common
 let end_label = "end"
 
 let compile_preprocess =
-  let rec label_table = Hashtbl.create 100
-  and id_from_name name = match Hashtbl.find_opt label_table name with
+  let rec id_from_name tbl name = match Hashtbl.find_opt tbl name with
     | Some(id) -> id
-    | None -> let new_id = string_of_int (Hashtbl.length label_table)
-      in Hashtbl.add label_table name new_id; new_id
-  and aux = function
+    | None -> let new_id = string_of_int (Hashtbl.length tbl) in Hashtbl.add tbl name new_id; new_id
+  and aux tbl = function
     | [] -> [ Label(end_label) ]
-    | Comment(_) :: tail -> aux tail
-    | Label(name) :: tail -> Label(id_from_name name) :: aux tail
-    | EqPredicate(i, j, name) :: tail -> EqPredicate(i, j, id_from_name name) :: aux tail
-    | GEqPredicate(i, j, name) :: tail -> GEqPredicate(i, j, id_from_name name) :: aux tail
-    | GTPredicate(i, j, name) :: tail -> GTPredicate(i, j, id_from_name name) :: aux tail
-    | LEqPredicate(i, j, name) :: tail -> LEqPredicate(i, j, id_from_name name) :: aux tail
-    | LTPredicate(i, j, name) :: tail -> LTPredicate(i, j, id_from_name name) :: aux tail
-    | ZeroPredicate(i, name) :: tail -> ZeroPredicate(i, id_from_name name) :: aux tail
-    | Goto(name) :: tail -> Goto(id_from_name name) :: aux tail
-    | any :: tail -> any :: aux tail
-  in aux
+    | Comment(_) :: tail -> aux tbl tail
+    | Label(name) :: tail -> Label(id_from_name tbl name) :: aux tbl tail
+    | EqPredicate(i, j, name) :: tail -> EqPredicate(i, j, id_from_name tbl name) :: aux tbl tail
+    | GEqPredicate(i, j, name) :: tail -> GEqPredicate(i, j, id_from_name tbl name) :: aux tbl tail
+    | GTPredicate(i, j, name) :: tail -> GTPredicate(i, j, id_from_name tbl name) :: aux tbl tail
+    | LEqPredicate(i, j, name) :: tail -> LEqPredicate(i, j, id_from_name tbl name) :: aux tbl tail
+    | LTPredicate(i, j, name) :: tail -> LTPredicate(i, j, id_from_name tbl name) :: aux tbl tail
+    | ZeroPredicate(i, name) :: tail -> ZeroPredicate(i, id_from_name tbl name) :: aux tbl tail
+    | Goto(name) :: tail -> Goto(id_from_name tbl name) :: aux tbl tail
+    | any :: tail -> any :: aux tbl tail
+  in aux (Hashtbl.create 100)
 
 let build_initial_state eurmcmds =
   let max_reg_of_instr = function
@@ -36,11 +34,13 @@ let build_initial_state eurmcmds =
     | _ -> 0
   in
   { max_reg = List.fold_left (fun acc instr -> max acc (max_reg_of_instr instr)) 0 eurmcmds;
-    label_count = List.fold_left (fun acc instr -> acc + (match instr with | Label(_) -> 1 | _ -> 0)) 0 eurmcmds }
+    label_count = List.fold_left (fun acc instr -> acc + (match instr with | Label(_) -> 1 | _ -> 0)) 0 eurmcmds;
+    label_table = Hashtbl.create 100 }
 
 let add_reg_label state new_regs new_labels =
   { max_reg = state.max_reg + new_regs;
-    label_count = state.label_count + new_labels }
+    label_count = state.label_count + new_labels;
+    label_table = state.label_table }
 
 let make_reg state offset = state.max_reg + offset
 let make_label state offset = string_of_int (state.label_count + offset)
@@ -128,19 +128,18 @@ let compile_stage3 eurmcmds state =
   in apply_transform (transform) state eurmcmds
 
 let compile_stage4 eurmcmds state =
-  let label_table = Hashtbl.create 100
-  in let build_label_table =
-       List.iteri (fun lineo cmd -> match cmd with | Label(lbl) -> Hashtbl.add label_table lbl lineo | _ -> ())
+  let build_label_table state eurmcmds=
+       List.iteri (fun lineo cmd -> match cmd with | Label(lbl) -> Hashtbl.add state.label_table lbl lineo | _ -> ()) eurmcmds; state
   in let transform state = function
       | Inc(r) -> [ URMSucc(r) ], state
       | Zero(r) -> [ URMZero(r) ], state
       | Copy(r1, r2) -> [ URMCopy(r1, r2) ], state
-      | EqPredicate(r1, r2, lbl) -> [ URMJump(r1, r2, Hashtbl.find label_table lbl) ], state
+      | EqPredicate(r1, r2, lbl) -> [ URMJump(r1, r2, Hashtbl.find state.label_table lbl) ], state
       | Label(_) ->
         let dummy_reg = make_reg state 1
         in [ URMZero(dummy_reg) ], add_reg_label state 1 0
       | _ -> failwith "Invalid_argument"
-  in build_label_table eurmcmds; apply_transform (transform) state eurmcmds
+  in apply_transform (transform) (build_label_table state eurmcmds) eurmcmds
 
 let urm_from_eurm eurmcmds =
   let chain transform (eurmcmds, compile_state) = transform eurmcmds compile_state
