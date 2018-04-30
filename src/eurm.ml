@@ -5,6 +5,8 @@
 
 open Common
 
+let end_label = "end"
+
 let compile_preprocess =
   let rec label_table = Hashtbl.create 100
   and id_from_name name = match Hashtbl.find_opt label_table name with
@@ -12,7 +14,7 @@ let compile_preprocess =
     | None -> let new_id = string_of_int (Hashtbl.length label_table)
       in Hashtbl.add label_table name new_id; new_id
   and aux = function
-    | [] -> [ Label("end") ]
+    | [] -> [ Label(end_label) ]
     | Comment(_) :: tail -> aux tail
     | Label(name) :: tail -> Label(id_from_name name) :: aux tail
     | EqPredicate(i, j, name) :: tail -> EqPredicate(i, j, id_from_name name) :: aux tail
@@ -109,7 +111,7 @@ let compile_stage2 eurmcmds state =
            Label(error_label); Quit; Label(end_label); Copy(r1, diff_reg) ],
          add_reg_label state 3 3
 
-    | Quit -> [ Goto("end") ], state
+    | Quit -> [ Goto(end_label) ], state
     | any -> [ any ], state
 
   in apply_transform (transform) state eurmcmds
