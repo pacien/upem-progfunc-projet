@@ -35,12 +35,17 @@ let build_initial_state eurmcmds =
   in
   { max_reg = List.fold_left (fun acc instr -> max acc (max_reg_of_instr instr)) 0 eurmcmds;
     label_count = List.fold_left (fun acc instr -> acc + (match instr with | Label(_) -> 1 | _ -> 0)) 0 eurmcmds;
-    label_table = Hashtbl.create 100 }
+    label_table = [] }
 
 let add_reg_label state new_regs new_labels =
   { max_reg = state.max_reg + new_regs;
     label_count = state.label_count + new_labels;
     label_table = state.label_table }
+
+let put_labels state tbl =
+  { max_reg = state.max_reg;
+    label_count = state.label_count;
+    label_table = tbl }
 
 let make_reg state offset = state.max_reg + offset
 let make_label state offset = string_of_int (state.label_count + offset)
@@ -128,13 +133,16 @@ let compile_stage3 eurmcmds state =
   in apply_transform (transform) state eurmcmds
 
 let compile_stage4 eurmcmds state =
-  let build_label_table state eurmcmds=
-       List.iteri (fun lineo cmd -> match cmd with | Label(lbl) -> Hashtbl.add state.label_table lbl lineo | _ -> ()) eurmcmds; state
+  let build_label_table state eurmcmds =
+    List.mapi (fun lineno cmd -> (cmd, lineno)) eurmcmds
+    |> List.filter (fun (cmd, _) -> match cmd with | Label(_) -> true | _ -> false)
+    |> List.map (fun (cmd, lineno) -> match cmd with | Label(lbl) -> (lbl, lineno) | _ -> failwith "Unexpected state")
+    |> put_labels state
   in let transform state = function
       | Inc(r) -> [ URMSucc(r) ], state
       | Zero(r) -> [ URMZero(r) ], state
       | Copy(r1, r2) -> [ URMCopy(r1, r2) ], state
-      | EqPredicate(r1, r2, lbl) -> [ URMJump(r1, r2, Hashtbl.find state.label_table lbl) ], state
+      | EqPredicate(r1, r2, lbl) -> [ URMJump(r1, r2, List.assoc lbl state.label_table) ], state
       | Label(_) ->
         let dummy_reg = make_reg state 1
         in [ URMZero(dummy_reg) ], add_reg_label state 1 0
