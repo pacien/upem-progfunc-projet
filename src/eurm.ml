@@ -12,7 +12,7 @@ let compile_preprocess =
     | None -> let new_id = string_of_int (Hashtbl.length label_table)
       in Hashtbl.add label_table name new_id; new_id
   and aux = function
-    | [] -> []
+    | [] -> [ Label("end") ]
     | Comment(_) :: tail -> aux tail
     | Label(name) :: tail -> Label(id_from_name name) :: aux tail
     | EqPredicate(i, j, name) :: tail -> EqPredicate(i, j, id_from_name name) :: aux tail
@@ -109,6 +109,7 @@ let compile_stage2 eurmcmds state =
            Label(error_label); Quit; Label(end_label); Copy(r1, diff_reg) ],
          add_reg_label state 3 3
 
+    | Quit -> [ Goto("end") ], state
     | any -> [ any ], state
 
   in apply_transform (transform) state eurmcmds
@@ -135,9 +136,6 @@ let compile_stage4 eurmcmds state =
     | Label(_) ->
       let dummy_reg = state.max_reg + 1
       in [ URMZero(dummy_reg) ], add_reg_label state 1 0
-    | Quit ->
-      let dummy_reg = state.max_reg + 1
-      in [ URMZero(dummy_reg); URMJump(dummy_reg, dummy_reg, -1) ], add_reg_label state 1 0
     | _ -> failwith "Invalid_argument"
   in build_label_table eurmcmds; apply_transform (transform) state eurmcmds
 
