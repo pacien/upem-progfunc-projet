@@ -45,12 +45,12 @@ let add_reg_label state new_regs new_labels = {
 let rec apply_transform transform_func state = function
   | [] -> [], state
   | cmd :: tail ->
-    let substitution, new_state = transform_func cmd
+    let substitution, new_state = transform_func state cmd
     in let prgm_tail, end_state = apply_transform transform_func new_state tail
     in substitution @ prgm_tail, end_state
 
 let compile_stage1 eurmcmds state =
-  let transform = function
+  let transform state = function
     | Dec(r) ->
       let new_reg = state.max_reg + 1
       in [ Zero(new_reg); Inc(new_reg); Sub(r, new_reg) ],
@@ -84,7 +84,7 @@ let compile_stage1 eurmcmds state =
   in apply_transform (transform) state eurmcmds
 
 let compile_stage2 eurmcmds state =
-  let transform = function
+  let transform state = function
     | Add(r1, r2) ->
       let ctr_reg = state.max_reg + 1
       and start_label = string_of_int (state.label_count + 1) and end_label = string_of_int (state.label_count + 2)
@@ -115,7 +115,7 @@ let compile_stage2 eurmcmds state =
   in apply_transform (transform) state eurmcmds
 
 let compile_stage3 eurmcmds state =
-  let transform = function
+  let transform state = function
     | Goto(lbl) ->
       let dummy_reg = state.max_reg + 1
       in [ Zero(dummy_reg); EqPredicate(dummy_reg, dummy_reg, lbl) ],
@@ -128,7 +128,7 @@ let compile_stage4 eurmcmds state =
   let label_table = Hashtbl.create 100
   in let build_label_table =
        List.iteri (fun lineo cmd -> match cmd with | Label(lbl) -> Hashtbl.add label_table lbl lineo | _ -> ())
-  in let transform = function
+  in let transform state = function
     | Inc(r) -> [ URMSucc(r) ], state
     | Zero(r) -> [ URMZero(r) ], state
     | Copy(r1, r2) -> [ URMCopy(r1, r2) ], state
