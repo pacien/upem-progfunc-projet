@@ -37,7 +37,14 @@ let build_initial_state eurmcmds =
     label_count = List.fold_left (fun acc instr -> acc + (match instr with | Label(_) -> 1 | _ -> 0)) 0 eurmcmds
   }
 
-let rec compile_stage1 eurmcmds state =
+let rec apply_transform transform_func state = function
+  | [] -> [], state
+  | cmd :: tail ->
+    let substitution, new_state = transform_func cmd
+    in let prgm_tail, end_state = apply_transform transform_func new_state tail
+    in substitution @ prgm_tail, end_state
+
+let compile_stage1 eurmcmds state =
   let transform = function
     | Dec(r) ->
       let new_reg = state.max_reg + 1
@@ -69,15 +76,38 @@ let rec compile_stage1 eurmcmds state =
     | LTPredicate(r1, r2, l) -> [ GTPredicate(r2, r1, l) ], state
     | any -> [ any ], state
 
-  in match eurmcmds with
-  | [] -> [], state
-  | cmd :: tail ->
-    let substitution, new_state = transform cmd
-    in let prgm_tail, end_state = compile_stage1 tail new_state
-    in substitution @ prgm_tail, end_state
+  in apply_transform (transform) state eurmcmds
 
+let compile_stage2 eurmcmds state =
+  let transform = function
+    | Add(r1, r2) ->
+      let ctr_reg = state.max_reg + 1
+      and start_label = string_of_int (state.label_count + 1) and end_label = string_of_int (state.label_count + 2)
+      in [ Zero(ctr_reg); Label(start_label); EqPredicate(ctr_reg, r2, end_label);
+           Inc(r1); Inc(ctr_reg); Goto(start_label); Label(end_label) ],
+         { max_reg = state.label_count + 1; label_count = state.label_count + 2 }
 
-let compile_stage2 eurmcmds state = eurmcmds, state
+    | GTPredicate(r1, r2, l) ->
+      let aux_reg = state.max_reg + 1
+      and start_label = string_of_int (state.label_count + 1) and end_label = string_of_int (state.label_count + 2)
+      in [ Zero(aux_reg); Label(start_label); EqPredicate(aux_reg, r1, end_label); EqPredicate(aux_reg, r2, l);
+           Inc(aux_reg); Goto(start_label); Label(end_label) ],
+         { max_reg = state.label_count + 1; label_count = state.label_count + 2 }
+
+    | Sub(r1, r2) ->
+      let diff_reg = state.max_reg + 1 and aux1_reg = state.max_reg + 2 and aux2_reg = state.max_reg + 3
+      and start_label = string_of_int (state.label_count + 1) and end_label = string_of_int (state.label_count + 2)
+      and error_label = string_of_int (state.label_count + 3)
+      in [ Zero(diff_reg); Copy(aux1_reg, r1); Copy(aux2_reg, r2); Label(start_label);
+           EqPredicate(aux1_reg, r2, error_label); EqPredicate(aux2_reg, r1, end_label);
+           Inc(diff_reg); Inc(aux1_reg); Inc(aux2_reg); Goto(start_label);
+           Label(error_label); Quit; Label(end_label); Copy(r1, diff_reg) ],
+         { max_reg = state.label_count + 3; label_count = state.label_count + 3 }
+
+    | any -> [ any ], state
+
+  in apply_transform (transform) state eurmcmds
+
 let compile_stage3 eurmcmds state = eurmcmds, state
 let compile_stage4 eurmcmds state = [URMZero(0)], state
 
