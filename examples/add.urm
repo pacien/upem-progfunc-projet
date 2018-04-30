@@ -1,11 +1,5 @@
-ZERO 0
-ZERO 3
-JUMP 1 3 6
-SUCC 0
-SUCC 3
-JUMP 3 3 2
-ZERO 3
-JUMP 2 3 11
-SUCC 0
-SUCC 3
-JUMP 3 3 7
+Zero 3
+Jump 2 3 5
+Succ 1
+Succ 3
+Jump 1 1 1

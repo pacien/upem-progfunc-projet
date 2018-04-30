@@ -1,0 +1,16 @@
+COMMENT Put in Register 1 the sum 1 + 2 + ... + n,
+COMMENT where n is the initial value of Register 1.
+
+COMMENT Initialization
+COPY 2 1
+ZERO 3
+
+COMMENT Main loop
+LABEL loop
+EQ? 2 3 done
+ADD 1 3
+INC 3
+GOTO loop
+
+COMMENT That's all folks !
+LABEL done

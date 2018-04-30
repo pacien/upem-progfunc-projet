@@ -1,0 +1,25 @@
+COMMENT Decide wether the content of Register 1 is even.
+COMMENT The output is 0 if it is even and 1 otherwise
+
+COMMENT initialization
+ZERO 2
+
+COMMENT main loop
+LABEL loop
+COMMENT invariant: R2 is even
+EQ? 1 2 even
+INC 2
+COMMENT invariant: R2 is odd
+EQ? 1 2 odd
+INC 2
+GOTO loop
+
+COMMENT R1 holds an even number
+LABEL even
+ZERO 1
+QUIT
+
+COMMENT R1 holds an odd number
+LABEL odd
+ZERO 1
+INC 1
