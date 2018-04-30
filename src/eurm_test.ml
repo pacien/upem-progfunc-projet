@@ -8,6 +8,7 @@ open Urm
 open Eurm
 open Kaputt.Abbreviations
 
+(*
 let () =
   Test.add_simple_test
     ~title:"example_eurm_factorial_conversion"
@@ -72,3 +73,4 @@ let () =
          Assert.is_true (output_urm = expected_urm))
 
 let () = if Array.mem "run-tests" Sys.argv then Test.launch_tests ()
+                                                *)

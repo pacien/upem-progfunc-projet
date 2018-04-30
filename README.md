@@ -20,7 +20,7 @@ Unlimited Register Machine in OCaml.
 ## Usage
 
 ```
-./urm <run | trace> <program file> <initial register state file>
+./urm <run | trace> <urm | eurm> <program file> <initial register state file>
 ```
 
 Examples programs are provided in the `examples` folder.
