@@ -130,10 +130,14 @@ let compile_stage4 eurmcmds state =
   in let transform = function
     | Inc(r) -> [ URMSucc(r) ], state
     | Zero(r) -> [ URMZero(r) ], state
+    | Copy(r1, r2) -> [ URMCopy(r1, r2) ], state
     | EqPredicate(r1, r2, lbl) -> [ URMJump(r1, r2, Hashtbl.find label_table lbl) ], state
     | Label(_) ->
       let dummy_reg = state.max_reg + 1
       in [ URMZero(dummy_reg) ], add_reg_label state 1 0
+    | Quit ->
+      let dummy_reg = state.max_reg + 1
+      in [ URMZero(dummy_reg); URMJump(dummy_reg, dummy_reg, -1) ], add_reg_label state 1 0
     | _ -> failwith "Invalid_argument"
   in build_label_table eurmcmds; apply_transform (transform) state eurmcmds
 
