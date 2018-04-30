@@ -22,13 +22,13 @@ let () =
        let output = run_eurm_prgm "../examples/add.eurm" [Reg(1, 5); Reg(2, 3)]
        in Assertion.equal (regs_get output 1) (5 + 3))
 
-(*let () =
+let () =
   Test.add_simple_test
     ~title:"example_eurm_factorial"
     (fun () ->
        let output = run_eurm_prgm "../examples/factorial.eurm" [Reg(1, 5)]
        in Assertion.equal (regs_get output 1) 120)
-*)
+
 let () =
   Test.add_simple_test
     ~title:"example_eurm_sum_first_integers"
