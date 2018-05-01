@@ -4,7 +4,7 @@ Unlimited Register Machine in OCaml.
 
 ## Requirements
 
-* ocaml
+* ocaml (≥4.05.0)
 * GNU Make
 * [OCaml Makefile](https://mmottl.github.io/ocaml-makefile/)
 * [kaputt](http://kaputt.x9c.fr/)
