@@ -7,23 +7,26 @@ open Common
 
 let end_label = "end"
 
-let compile_preprocess =
-  let rec id_from_name tbl name = match Hashtbl.find_opt tbl name with
-    | Some(id) -> id
-    | None -> let new_id = string_of_int (Hashtbl.length tbl) in Hashtbl.add tbl name new_id; new_id
-  and aux tbl = function
+let compile_preprocess cmd_list =
+  let rec id_from_name tbl name = string_of_int (List.assoc name tbl)
+  and build_label_table cmd_list =
+    List.filter (fun cmd -> match cmd with | Label(_) -> true | _ -> false) cmd_list
+    |> List.mapi (fun id cmd -> match cmd with | Label(name) -> (name, id) | _ -> failwith "Unexpected state")
+  and rewrite_label tbl = function
+    | Label(name) -> Label(id_from_name tbl name)
+    | EqPredicate(i, j, name) -> EqPredicate(i, j, id_from_name tbl name)
+    | GEqPredicate(i, j, name) -> GEqPredicate(i, j, id_from_name tbl name)
+    | GTPredicate(i, j, name) -> GTPredicate(i, j, id_from_name tbl name)
+    | LEqPredicate(i, j, name) -> LEqPredicate(i, j, id_from_name tbl name)
+    | LTPredicate(i, j, name) -> LTPredicate(i, j, id_from_name tbl name)
+    | ZeroPredicate(i, name) -> ZeroPredicate(i, id_from_name tbl name)
+    | Goto(name) -> Goto(id_from_name tbl name)
+    | any -> any
+  and rewrite_labels tbl = function
     | [] -> [ Label(end_label) ]
-    | Comment(_) :: tail -> aux tbl tail
-    | Label(name) :: tail -> Label(id_from_name tbl name) :: aux tbl tail
-    | EqPredicate(i, j, name) :: tail -> EqPredicate(i, j, id_from_name tbl name) :: aux tbl tail
-    | GEqPredicate(i, j, name) :: tail -> GEqPredicate(i, j, id_from_name tbl name) :: aux tbl tail
-    | GTPredicate(i, j, name) :: tail -> GTPredicate(i, j, id_from_name tbl name) :: aux tbl tail
-    | LEqPredicate(i, j, name) :: tail -> LEqPredicate(i, j, id_from_name tbl name) :: aux tbl tail
-    | LTPredicate(i, j, name) :: tail -> LTPredicate(i, j, id_from_name tbl name) :: aux tbl tail
-    | ZeroPredicate(i, name) :: tail -> ZeroPredicate(i, id_from_name tbl name) :: aux tbl tail
-    | Goto(name) :: tail -> Goto(id_from_name tbl name) :: aux tbl tail
-    | any :: tail -> any :: aux tbl tail
-  in aux (Hashtbl.create 100)
+    | any :: tail -> rewrite_label tbl any :: rewrite_labels tbl tail
+  in let cmds = List.filter (fun cmd -> match cmd with | Comment(_) -> false | _ -> true) cmd_list
+  in rewrite_labels (build_label_table cmds) cmds
 
 let build_initial_state eurmcmds =
   let max_reg_of_instr = function
@@ -138,11 +141,12 @@ let compile_stage4 eurmcmds state =
     |> List.filter (fun (cmd, _) -> match cmd with | Label(_) -> true | _ -> false)
     |> List.map (fun (cmd, lineno) -> match cmd with | Label(lbl) -> (lbl, lineno) | _ -> failwith "Unexpected state")
     |> put_labels state
+  and lineno_from_label state lbl = List.assoc lbl state.label_table
   in let transform state = function
       | Inc(r) -> [ URMSucc(r) ], state
       | Zero(r) -> [ URMZero(r) ], state
       | Copy(r1, r2) -> [ URMCopy(r1, r2) ], state
-      | EqPredicate(r1, r2, lbl) -> [ URMJump(r1, r2, List.assoc lbl state.label_table) ], state
+      | EqPredicate(r1, r2, lbl) -> [ URMJump(r1, r2, lineno_from_label state lbl) ], state
       | Label(_) ->
         let dummy_reg = make_reg state 1
         in [ URMZero(dummy_reg) ], add_reg_label state 1 0
