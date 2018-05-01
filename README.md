@@ -12,6 +12,8 @@ Unlimited Register Machine in OCaml.
 
 ## Make targets
 
+In the `src` directory:
+
 * Build: `make nc` produces a binary named `urm`
 * Test: `make test`
 * Clean: `make clean`
